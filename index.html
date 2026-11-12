@@ -1,1 +1,1741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Trust School — Class 7 Interactive Science Contest</title>
+  <!-- Tailwind CSS for responsive, modern scientific UI -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Font: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f1f5f9;
+      color: #0f172a;
+    }
+    /* Custom scrollbar for smooth reading */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #e2e8f0;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #94a3b8;
+      border-radius: 9999px;
+    }
+    /* Canvas responsive container */
+    .sim-canvas {
+      width: 100%;
+      height: 310px;
+      display: block;
+      border-radius: 0.75rem;
+    }
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+      body {
+        background: #ffffff !important;
+      }
+      .print-only {
+        display: block !important;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
 
+  <!-- TOP BRAND & CONTEST CONTROL HEADER -->
+  <header class="bg-[#0f4c5c] text-white shadow-lg sticky top-0 z-30 no-print">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+      <!-- School Branding -->
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-[#e36414] flex items-center justify-center font-extrabold text-xl shadow-inner shrink-0">
+          TS
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg font-extrabold tracking-wide uppercase leading-tight">
+            The Trust School — Class 7 Interactive Science Contest
+          </h1>
+          <p class="text-xs sm:text-sm text-cyan-100 font-medium">
+            Nanotech, Chemical Reactions &amp; Applied Science Lab (30 Marks)
+          </p>
+        </div>
+      </div>
+
+      <!-- Live Timer, Score & Teacher Mode Toggle -->
+      <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+        <!-- Countdown Timer -->
+        <div class="bg-[#093540] border border-cyan-700/60 rounded-xl px-3 py-1.5 flex items-center gap-2">
+          <span class="text-xs uppercase tracking-wider text-cyan-200 font-semibold">Time:</span>
+          <span id="timerDisplay" class="font-mono font-bold text-base sm:text-lg text-amber-300">45:00</span>
+          <button onclick="toggleTimer()" id="timerToggleBtn" class="ml-1 px-2 py-0.5 text-xs font-semibold rounded bg-cyan-700 hover:bg-cyan-600 transition">
+            Start
+          </button>
+          <button onclick="resetTimer()" class="px-2 py-0.5 text-xs font-semibold rounded bg-slate-700 hover:bg-slate-600 transition">
+            Reset
+          </button>
+        </div>
+
+        <!-- Live Score Badge -->
+        <div class="bg-emerald-900/90 border border-emerald-500/40 rounded-xl px-3.5 py-1.5 flex items-center gap-2">
+          <span class="text-xs uppercase tracking-wider text-emerald-200 font-semibold">Live Score:</span>
+          <span id="totalScoreDisplay" class="font-extrabold text-base sm:text-lg text-white">0</span>
+          <span class="text-xs text-emerald-200 font-semibold">/ 30</span>
+        </div>
+
+        <!-- Teacher / Judge Mode Toggle -->
+        <button onclick="openTeacherModal()" id="teacherModeBtn" class="px-3 py-2 rounded-xl text-xs sm:text-sm font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 shadow transition flex items-center gap-1.5">
+          <span>🔒 Judge Mode: OFF</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Team & Section Registration Strip -->
+    <div class="bg-[#0b3b47] border-t border-cyan-800/70">
+      <div class="max-w-7xl mx-auto px-4 py-2.5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 text-sm">
+        <div class="flex items-center gap-2">
+          <label for="teamNameInput" class="text-cyan-200 font-semibold text-xs uppercase shrink-0">Team / House:</label>
+          <input id="teamNameInput" type="text" placeholder="e.g., Iqbal House Sparks" class="w-full rounded-lg px-2.5 py-1 bg-white/95 text-slate-900 font-medium text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-400" />
+        </div>
+        <div class="flex items-center gap-2">
+          <label for="sectionSelect" class="text-cyan-200 font-semibold text-xs uppercase shrink-0">Class Section:</label>
+          <select id="sectionSelect" class="w-full rounded-lg px-2.5 py-1 bg-white/95 text-slate-900 font-semibold text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+            <option value="Section 7-A">Section 7-A</option>
+            <option value="Section 7-B">Section 7-B</option>
+            <option value="Section 7-C">Section 7-C</option>
+            <option value="Section 7-D">Section 7-D</option>
+            <option value="Section 7-E">Section 7-E</option>
+          </select>
+        </div>
+        <div class="flex items-center gap-2">
+          <label for="membersInput" class="text-cyan-200 font-semibold text-xs uppercase shrink-0">Students:</label>
+          <input id="membersInput" type="text" placeholder="Ali, Fatima, Hamza" class="w-full rounded-lg px-2.5 py-1 bg-white/95 text-slate-900 font-medium text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-400" />
+        </div>
+        <div class="flex items-center justify-end gap-2">
+          <button onclick="recordToLeaderboard()" class="w-full sm:w-auto px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wide shadow transition">
+            Save Score to Board
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- TEACHER / JUDGE MODE BANNER (Visible only when unlocked) -->
+  <div id="teacherBanner" class="hidden bg-amber-100 border-b-2 border-amber-400 text-amber-950 px-4 py-2.5 no-print">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm">
+      <div class="flex items-center gap-2 font-semibold">
+        <span class="px-2 py-0.5 rounded bg-amber-500 text-white font-bold uppercase text-xs">Judge Mode Active</span>
+        <span>Answer keys &amp; marking rubrics are now unlocked inside every module below.</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="autoFillDemoAnswers()" class="px-3 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs transition">
+          Preview Full-Score Solution
+        </button>
+        <button onclick="disableTeacherMode()" class="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs transition">
+          Lock Judge Mode
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAVIGATION TABS -->
+  <nav class="max-w-7xl w-full mx-auto px-4 pt-4 no-print">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+      <button onclick="switchTab('tab1')" id="btn-tab1" class="tab-btn active-tab flex flex-col items-start p-3.5 rounded-xl border-2 border-[#0f4c5c] bg-[#0f4c5c] text-white shadow-sm transition text-left">
+        <span class="text-xs uppercase font-bold opacity-80">Part 1 • 10 Marks</span>
+        <span class="text-sm sm:text-base font-extrabold mt-0.5">1. Nanotech Diabetes Lab</span>
+      </button>
+      <button onclick="switchTab('tab2')" id="btn-tab2" class="tab-btn flex flex-col items-start p-3.5 rounded-xl border-2 border-slate-200 bg-white text-slate-800 hover:border-[#0f4c5c] transition text-left">
+        <span class="text-xs uppercase font-bold text-[#e36414]">Part 2 • 10 Marks</span>
+        <span class="text-sm sm:text-base font-extrabold mt-0.5">2. STEM &amp; Motion Simulator</span>
+      </button>
+      <button onclick="switchTab('tab3')" id="btn-tab3" class="tab-btn flex flex-col items-start p-3.5 rounded-xl border-2 border-slate-200 bg-white text-slate-800 hover:border-[#0f4c5c] transition text-left">
+        <span class="text-xs uppercase font-bold text-[#e36414]">Part 3 • 10 Marks</span>
+        <span class="text-sm sm:text-base font-extrabold mt-0.5">3. Chemistry Gas Lab</span>
+      </button>
+      <button onclick="switchTab('tab4')" id="btn-tab4" class="tab-btn flex flex-col items-start p-3.5 rounded-xl border-2 border-slate-200 bg-white text-slate-800 hover:border-[#0f4c5c] transition text-left">
+        <span class="text-xs uppercase font-bold text-emerald-700">Live Standings &amp; Export</span>
+        <span class="text-sm sm:text-base font-extrabold mt-0.5">4. Leaderboard &amp; Certificate</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT AREA -->
+  <main class="max-w-7xl w-full mx-auto px-4 py-5 flex-1">
+
+    <!-- ========================================================= -->
+    <!-- TAB 1: NANOTECH DIABETES LAB & ANALYTICAL READING (10 PTS) -->
+    <!-- ========================================================= -->
+    <section id="tab1" class="tab-content space-y-6">
+      <!-- Interactive Nanotech Chip Simulation Card -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
+          <div>
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold bg-cyan-100 text-[#0f4c5c] mb-1">
+              Interactive Biomedical Simulator
+            </span>
+            <h2 class="text-xl font-extrabold text-slate-900">
+              Stanford Gold-Studded Glass Chip Amplifier
+            </h2>
+            <p class="text-sm text-slate-600">
+              Compare a standard glass slide with a gold-nanoparticle chip (100&times; sensitivity boost) across different patient blood drops.
+            </p>
+          </div>
+          <!-- Chip Mode Toggle -->
+          <div class="flex flex-wrap gap-2">
+            <button onclick="setChipType('standard')" id="chipStandardBtn" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold border-2 border-slate-300 bg-slate-100 text-slate-700 transition">
+              Standard Glass Chip (1&times;)
+            </button>
+            <button onclick="setChipType('gold')" id="chipGoldBtn" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold border-2 border-amber-500 bg-amber-500 text-slate-950 shadow transition">
+              ✨ Gold-Studded Nanotech Chip (100&times;)
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 items-center">
+          <!-- Canvas Visualizer -->
+          <div class="lg:col-span-2 bg-slate-950 rounded-xl p-2 border border-slate-800 relative">
+            <canvas id="nanotechCanvas" class="sim-canvas"></canvas>
+            <div id="nanoReadoutBadge" class="mt-2 px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-xs sm:text-sm text-cyan-200 flex flex-wrap justify-between gap-2">
+              <span><strong>Sample:</strong> Type 1 Diabetes Blood</span>
+              <span><strong>Signal Strength:</strong> <span class="text-amber-400 font-bold">98% (Clear Positive Detection!)</span></span>
+            </div>
+          </div>
+
+          <!-- Sample Selector & Lab Guide -->
+          <div class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
+            <h3 class="font-bold text-sm uppercase tracking-wider text-[#0f4c5c]">1. Select Patient Blood Drop:</h3>
+            <div class="space-y-2">
+              <button onclick="setBloodSample('type1')" id="sampleType1Btn" class="w-full text-left px-3.5 py-2.5 rounded-xl border-2 border-[#0f4c5c] bg-cyan-50 font-semibold text-sm text-slate-900 transition">
+                🩸 Patient A: Type 1 Diabetes
+                <span class="block text-xs font-normal text-slate-600">Contains pancreas-targeting autoimmune antibodies</span>
+              </button>
+              <button onclick="setBloodSample('type2')" id="sampleType2Btn" class="w-full text-left px-3.5 py-2.5 rounded-xl border-2 border-slate-200 bg-white hover:border-slate-400 font-semibold text-sm text-slate-900 transition">
+                🩸 Patient B: Type 2 Diabetes
+                <span class="block text-xs font-normal text-slate-600">No autoimmune antibodies; cells resist insulin</span>
+              </button>
+              <button onclick="setBloodSample('healthy')" id="sampleHealthyBtn" class="w-full text-left px-3.5 py-2.5 rounded-xl border-2 border-slate-200 bg-white hover:border-slate-400 font-semibold text-sm text-slate-900 transition">
+                🩸 Patient C: Healthy Control
+                <span class="block text-xs font-normal text-slate-600">Normal insulin &amp; zero autoimmune antibodies</span>
+              </button>
+            </div>
+            <div class="p-3 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-900 leading-relaxed">
+              <strong>Observation Tip:</strong> Switch Patient A to the <em>Standard Glass Chip</em>—notice how faint the antibody signal becomes! Then switch back to the <em>Gold-Studded Chip</em> to see the 100&times; fluorescence amplification.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Analytical Reading Passage & 5 Assessed Questions -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Scientific Report -->
+        <article class="lg:col-span-5 bg-[#f0f7f9] border border-[#bce0ea] rounded-2xl p-5 space-y-3 h-fit">
+          <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#0f4c5c] text-white">
+            Biomedical Research Report
+          </span>
+          <h3 class="text-lg font-extrabold text-[#0f4c5c]">
+            Gold Test for Diabetes: How Nanotechnology Speeds Up Diagnosis
+          </h3>
+          <p class="text-sm text-slate-800 leading-relaxed">
+            There are several types of diabetes, and all of them are connected by <strong>insulin</strong>—a vital hormone produced by the <strong>pancreas</strong> (an organ located behind your stomach). Insulin controls how much glucose (sugar) moves from your bloodstream into your muscles and body cells to produce energy. Without proper insulin control, blood sugar reaches dangerous levels.
+          </p>
+          <p class="text-sm text-slate-800 leading-relaxed">
+            <strong>Type 1 diabetes</strong> is an <em>autoimmune disease</em>, meaning the body’s immune system mistakenly attacks itself. It produces specialized proteins called <strong>antibodies</strong> that destroy insulin-making cells in the pancreas. In contrast, <strong>Type 2 diabetes</strong> does not involve autoimmune antibodies; instead, either the pancreas is damaged in another way, or body cells stop responding properly to insulin.
+          </p>
+          <p class="text-sm text-slate-800 leading-relaxed">
+            When a patient is diagnosed with diabetes, doctors must quickly identify whether it is Type 1 or Type 2 so they can prescribe the right treatment. Traditionally, testing blood for Type 1 antibodies was slow and expensive, while faster tests were not sensitive enough to detect tiny traces of antibodies. To solve this, researchers at Stanford University used <strong>nanotechnology</strong>: by placing microscopic islands of gold onto a glass chip, they created a signal amplifier that made rapid tests <strong>100 times more sensitive</strong>. Today, just a single drop of blood on a gold-studded glass chip gives doctors a fast, accurate, and affordable diagnosis.
+          </p>
+        </article>
+
+        <!-- Part 1 Questions (10 Marks) -->
+        <div class="lg:col-span-7 bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-5">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+            <div>
+              <h3 class="text-lg font-extrabold text-slate-900">Part 1 Assessment: Analytical Reading</h3>
+              <p class="text-xs text-slate-500">5 Questions &times; 2 Marks each = 10 Marks</p>
+            </div>
+            <span id="part1ScoreBadge" class="px-3 py-1 rounded-full bg-cyan-100 text-[#0f4c5c] font-extrabold text-sm">
+              Score: 0 / 10
+            </span>
+          </div>
+
+          <!-- Q1 -->
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+            <label class="block text-sm font-bold text-slate-900">
+              1. Which organ produces insulin, and what is insulin’s main biological job? (2 Marks)
+            </label>
+            <select id="p1q1" onchange="evaluateAll()" class="w-full rounded-lg border border-slate-300 p-2 text-sm bg-white">
+              <option value="">-- Select your team's answer --</option>
+              <option value="correct">The pancreas; it controls how much sugar (glucose) moves from the blood into muscles and cells for energy.</option>
+              <option value="wrong1">The stomach; it digests proteins and destroys harmful antibodies in the bloodstream.</option>
+              <option value="wrong2">The liver; it converts oxygen into carbon dioxide during physical exercise.</option>
+            </select>
+            <div class="teacher-key hidden text-xs bg-amber-50 border border-amber-300 p-2 rounded text-amber-950">
+              <strong>Judge Key:</strong> Pancreas (1 mark) + regulates glucose transfer from blood into muscles/cells for energy (1 mark).
+            </div>
+          </div>
+
+          <!-- Q2 -->
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+            <label class="block text-sm font-bold text-slate-900">
+              2. How does the biological cause of Type 1 diabetes differ from Type 2 diabetes? (2 Marks)
+            </label>
+            <select id="p1q2" onchange="evaluateAll()" class="w-full rounded-lg border border-slate-300 p-2 text-sm bg-white">
+              <option value="">-- Select your team's answer --</option>
+              <option value="wrong1">Type 1 is caused by eating too much fruit, while Type 2 is caused by gold nanoparticles.</option>
+              <option value="correct">Type 1 is an autoimmune attack where antibodies destroy pancreas cells; Type 2 has no antibodies, instead cells stop responding to insulin or the pancreas is damaged another way.</option>
+              <option value="wrong2">Both types are caused by autoimmune antibodies attacking the lungs and heart.</option>
+            </select>
+            <div class="teacher-key hidden text-xs bg-amber-50 border border-amber-300 p-2 rounded text-amber-950">
+              <strong>Judge Key:</strong> Type 1 autoimmune antibodies attacking pancreas (1 mark) vs. Type 2 insulin resistance / non-autoimmune damage (1 mark).
+            </div>
+          </div>
+
+          <!-- Q3 -->
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+            <label class="block text-sm font-bold text-slate-900">
+              3. How did Stanford researchers solve the low sensitivity of older rapid diabetes tests? (2 Marks)
+            </label>
+            <select id="p1q3" onchange="evaluateAll()" class="w-full rounded-lg border border-slate-300 p-2 text-sm bg-white">
+              <option value="">-- Select your team's answer --</option>
+              <option value="wrong1">By asking patients to donate a full litre of blood for a 3-week laboratory culture.</option>
+              <option value="wrong2">By mixing baking soda and vinegar onto a plastic strip to cool the blood sample.</option>
+              <option value="correct">By placing microscopic islands of gold on a glass chip to amplify the signal, making rapid tests 100 times more sensitive.</option>
+            </select>
+            <div class="teacher-key hidden text-xs bg-amber-50 border border-amber-300 p-2 rounded text-amber-950">
+              <strong>Judge Key:</strong> Microscopic islands of gold on a glass chip amplify signal 100&times; to detect trace Type 1 antibodies.
+            </div>
+          </div>
+
+          <!-- Q4 -->
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+            <label class="block text-sm font-bold text-slate-900">
+              4. Why must doctors quickly distinguish between Type 1 and Type 2 diabetes after diagnosis? (2 Marks)
+            </label>
+            <select id="p1q4" onchange="evaluateAll()" class="w-full rounded-lg border border-slate-300 p-2 text-sm bg-white">
+              <option value="">-- Select your team's answer --</option>
+              <option value="correct">Because Type 1 and Type 2 have different biological causes and require different medical treatments right away.</option>
+              <option value="wrong1">Because Type 1 diabetes is contagious through airborne droplets while Type 2 is not.</option>
+              <option value="wrong2">So doctors can decide whether the patient needs a magnifying glass.</option>
+            </select>
+            <div class="teacher-key hidden text-xs bg-amber-50 border border-amber-300 p-2 rounded text-amber-950">
+              <strong>Judge Key:</strong> Different root causes require prescribing the right treatment plan immediately (2 marks).
+            </div>
+          </div>
+
+          <!-- Q5 -->
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+            <label class="block text-sm font-bold text-slate-900">
+              5. Health Application: Which two lifestyle habits help reduce the risk of developing Type 2 diabetes? (2 Marks)
+            </label>
+            <select id="p1q5" onchange="evaluateAll()" class="w-full rounded-lg border border-slate-300 p-2 text-sm bg-white">
+              <option value="">-- Select your team's answer --</option>
+              <option value="wrong1">Avoiding all physical movement and drinking sugary sodas daily.</option>
+              <option value="correct">Eating plenty of fruits and vegetables and exercising regularly.</option>
+              <option value="wrong2">Wearing gold jewelry and sleeping 16 hours a day.</option>
+            </select>
+            <div class="teacher-key hidden text-xs bg-amber-50 border border-amber-300 p-2 rounded text-amber-950">
+              <strong>Judge Key:</strong> Eating plenty of fruits and vegetables (1 mark) + exercising regularly (1 mark).
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- TAB 2: RAPID-FIRE STEM & PHYSICS MOTION SIMULATOR (10 PTS)-->
+    <!-- ========================================================= -->
+    <section id="tab2" class="tab-content hidden space-y-6">
+      <!-- Unicycle Relative Motion Physics Visualizer -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
+          <div>
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold bg-orange-100 text-[#e36414] mb-1">
+              Interactive Physics Motion Lab
+            </span>
+            <h2 class="text-xl font-extrabold text-slate-900">
+              Unicycle Wheel Relative Velocity Simulator
+            </h2>
+            <p class="text-sm text-slate-600">
+              Explore how rotational speed combines with forward translational motion relative to the ground!
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-3 bg-slate-100 px-3.5 py-2 rounded-xl border border-slate-200">
+            <label for="unicycleSpeedSlider" class="text-xs font-bold uppercase text-slate-700">
+              Forward Speed: <span id="speedLabel" class="text-[#e36414] text-sm">10 km/h</span>
+            </label>
+            <input id="unicycleSpeedSlider" type="range" min="0" max="20" step="2" value="10" oninput="updateUnicycleSpeed(this.value)" class="accent-[#e36414] cursor-pointer" />
+            <button onclick="toggleSlowMo()" id="slowMoBtn" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-800 text-white hover:bg-slate-700 transition">
+              Slow-Mo: OFF
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 items-center">
+          <div class="lg:col-span-2 bg-slate-900 rounded-xl p-2 border border-slate-800">
+            <canvas id="unicycleCanvas" class="sim-canvas"></canvas>
+          </div>
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3 text-sm">
+            <h3 class="font-extrabold text-[#0f4c5c] uppercase text-xs tracking-wider">Instant Velocity Readout (Relative to Ground)</h3>
+            <div class="p-3 rounded-lg bg-emerald-50 border border-emerald-200 flex justify-between items-center">
+              <span class="font-semibold text-emerald-950">🟢 Top of Wheel (v + v):</span>
+              <span id="topWheelSpeed" class="font-mono font-extrabold text-emerald-700 text-base">20 km/h</span>
+            </div>
+            <div class="p-3 rounded-lg bg-amber-50 border border-amber-200 flex justify-between items-center">
+              <span class="font-semibold text-amber-950">🟡 Center Axle (v):</span>
+              <span id="axleWheelSpeed" class="font-mono font-extrabold text-amber-700 text-base">10 km/h</span>
+            </div>
+            <div class="p-3 rounded-lg bg-rose-50 border border-rose-200 flex justify-between items-center">
+              <span class="font-semibold text-rose-950">🔴 Bottom Contact (v &minus; v):</span>
+              <span id="bottomWheelSpeed" class="font-mono font-extrabold text-rose-700 text-base">0 km/h</span>
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed">
+              <strong>Why?</strong> Because the tire grips the road without slipping, the bottom point is momentarily stationary (<strong>0 km/h</strong>) relative to the ground, while the top moves forward at <strong>twice</strong> the axle speed!
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Part 2 Rapid-Fire Questions (10 Marks) -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+          <div>
+            <h3 class="text-lg font-extrabold text-slate-900">Part 2 Assessment: Rapid-Fire STEM &amp; Trivia Challenge</h3>
+            <p class="text-xs text-slate-500">5 Questions &times; 2 Marks each = 10 Marks</p>
+          </div>
+          <span id="part2ScoreBadge" class="px-3 py-1 rounded-full bg-orange-100 text-[#e36414] font-extrabold text-sm">
+            Score: 0 / 10
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Q1 -->
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+            <label class="block text-sm font-bold text-slate-900">
+              1. In biology, what does the classification term <em>‘ungulate’</em> mean? (2 Marks)
+            </label>
+            <select id="p2q1" onchange="evaluateAll()" class="w-full rounded-lg border border-slate-300 p-2 text-sm bg-white">
+              <option value="">-- Select answer --</option>
+              <option value="wrong1">Egg-laying reptile</option>
+              <option value="correct">Hoofed mammal (such as horses, cows, or deer)</option>
+              <option value="wrong2">Deep-sea bioluminescent fish</option>
+            </select>
+            <div class="teacher-key hidden text-xs bg-amber-50 border border-amber-300 p-2 rounded text-amber-950">
+              <strong>Judge Key:</strong> Hoofed mammal (2 marks).
+            </div>
+          </div>
+
+          <!-- Q2 -->
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+            <label class="block text-sm font-bold text-slate-900">
+              2. Ruby is the red variety of the mineral corundum. What is the blue variety called? (2 Marks)
+            </label>
+            <select id="p2q2" onchange="evaluateAll()" class="w-full rounded-lg border border-slate-300 p-2 text-sm bg-white">
+              <option value="">-- Select answer --</option>
+              <option value="correct">Sapphire</option>
+              <option value="wrong1">Emerald</option>
+              <option value="wrong2">Topaz</option>
+            </select>
+            <div class="teacher-key hidden text-xs bg-amber-50 border border-amber-300 p-2 rounded text-amber-950">
+              <strong>Judge Key:</strong> Sapphire (2 marks).
+            </div>
+          </div>
+
+          <!-- Q3 -->
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+            <label class="block text-sm font-bold text-slate-900">
+              3. <em>Draculin</em> is an anticoagulant (prevents blood clotting). Which animal produces it? (2 Marks)
+            </label>
+            <select id="p2q3" onchange="evaluateAll()" class="w-full rounded-lg border border-slate-300 p-2 text-sm bg-white">
+              <option value="">-- Select answer --</option>
+              <option value="wrong1">King Cobra</option>
+              <option value="wrong2">Komodo Dragon</option>
+              <option value="correct">Vampire bat (found in its saliva)</option>
+            </select>
+            <div class="teacher-key hidden text-xs bg-amber-50 border border-amber-300 p-2 rounded text-amber-950">
+              <strong>Judge Key:</strong> Vampire bat (2 marks).
+            </div>
+          </div>
+
+          <!-- Q4 -->
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+            <label class="block text-sm font-bold text-slate-900">
+              4. What is the name of Australia’s largest traditional Aboriginal ochre mine? (2 Marks)
+            </label>
+            <select id="p2q4" onchange="evaluateAll()" class="w-full rounded-lg border border-slate-300 p-2 text-sm bg-white">
+              <option value="">-- Select answer --</option>
+              <option value="wrong1">Uluru Cavern</option>
+              <option value="correct">Wilgie Mia</option>
+              <option value="wrong2">Kakadu Ridge</option>
+            </select>
+            <div class="teacher-key hidden text-xs bg-amber-50 border border-amber-300 p-2 rounded text-amber-950">
+              <strong>Judge Key:</strong> Wilgie Mia (2 marks).
+            </div>
+          </div>
+
+          <!-- Q5 (Physics Puzzle — 1 mark each for Top & Bottom speed) -->
+          <div class="md:col-span-2 p-4 rounded-xl bg-cyan-50/70 border border-cyan-200 space-y-3">
+            <label class="block text-sm font-bold text-slate-900">
+              5. Physics Puzzle: A unicycle travels forward at <strong>10 km/h</strong>. Relative to the ground, enter the speed of: (2 Marks — 1 Mark each)
+            </label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="flex items-center gap-2 bg-white p-2.5 rounded-lg border border-slate-300">
+                <span class="text-xs font-bold uppercase text-emerald-700 shrink-0">(a) Top of Wheel:</span>
+                <input id="p2q5a" type="number" oninput="evaluateAll()" placeholder="?" class="w-full font-mono font-bold text-sm px-2 py-1 border border-slate-200 rounded focus:outline-none focus:border-[#0f4c5c]" />
+                <span class="text-xs font-bold text-slate-500">km/h</span>
+              </div>
+              <div class="flex items-center gap-2 bg-white p-2.5 rounded-lg border border-slate-300">
+                <span class="text-xs font-bold uppercase text-rose-700 shrink-0">(b) Bottom of Wheel:</span>
+                <input id="p2q5b" type="number" oninput="evaluateAll()" placeholder="?" class="w-full font-mono font-bold text-sm px-2 py-1 border border-slate-200 rounded focus:outline-none focus:border-[#0f4c5c]" />
+                <span class="text-xs font-bold text-slate-500">km/h</span>
+              </div>
+            </div>
+            <div class="teacher-key hidden text-xs bg-amber-50 border border-amber-300 p-2 rounded text-amber-950">
+              <strong>Judge Key:</strong> (a) Top of wheel = <strong>20 km/h</strong> (1 mark); (b) Bottom of wheel = <strong>0 km/h</strong> (1 mark).
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- TAB 3: VIRTUAL CHEMISTRY LAB — POUR OUT THE GAS (10 PTS)  -->
+    <!-- ========================================================= -->
+    <section id="tab3" class="tab-content hidden space-y-6">
+      <!-- Interactive Chemistry Bench Simulation -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
+          <div>
+            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-800 mb-1">
+              Interactive Chemistry &amp; Fire Safety Bench
+            </span>
+            <h2 class="text-xl font-extrabold text-slate-900">
+              Experiment: "Pour Out the Invisible Gas"
+            </h2>
+            <p class="text-sm text-slate-600">
+              Follow the 4 lab steps to generate carbon dioxide (CO<sub>2</sub>) and pour the dense gas over a lit candle!
+            </p>
+          </div>
+          <button onclick="resetChemLab()" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-200 hover:bg-slate-300 text-slate-800 transition self-start">
+            ↺ Reset Lab Bench
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 items-start">
+          <!-- Chemistry Canvas -->
+          <div class="lg:col-span-2 bg-slate-950 rounded-xl p-2 border border-slate-800">
+            <canvas id="chemCanvas" class="sim-canvas"></canvas>
+            <!-- Balanced Equation Display -->
+            <div class="mt-2 px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-center font-mono text-xs sm:text-sm text-emerald-300">
+              NaHCO<sub>3</sub> (s) + CH<sub>3</sub>COOH (aq) &rarr; CH<sub>3</sub>COONa (aq) + H<sub>2</sub>O (l) + <strong>CO<sub>2</sub> (g) &uarr;</strong>
+            </div>
+          </div>
+
+          <!-- Step-by-Step Interactive Lab Controls & Fire Triangle -->
+          <div class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
+            <h3 class="font-extrabold text-xs uppercase tracking-wider text-[#0f4c5c]">Lab Bench Controls</h3>
+
+            <button onclick="chemLightCandle()" id="btnLightCandle" class="w-full py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm bg-amber-500 hover:bg-amber-400 text-slate-950 shadow transition text-left flex items-center justify-between">
+              <span>Step 1: Light the Candle</span>
+              <span id="step1Check">🔥</span>
+            </button>
+
+            <button onclick="chemAddSoda()" id="btnAddSoda" class="w-full py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm bg-white border-2 border-slate-300 hover:border-[#0f4c5c] text-slate-800 transition text-left flex items-center justify-between">
+              <span>Step 2: Add 2 Tbsp Baking Soda</span>
+              <span id="step2Check">🥄</span>
+            </button>
+
+            <button onclick="chemAddVinegar()" id="btnAddVinegar" class="w-full py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm bg-white border-2 border-slate-300 hover:border-[#0f4c5c] text-slate-800 transition text-left flex items-center justify-between">
+              <span>Step 3: Pour &frac14; Cup Vinegar (Fizz!)</span>
+              <span id="step3Check">🧪</span>
+            </button>
+
+            <div class="p-3 rounded-xl bg-white border border-slate-300 space-y-2">
+              <div class="flex justify-between items-center">
+                <label for="jugTiltSlider" class="text-xs font-bold uppercase text-slate-700">
+                  Step 4: Tilt Jug Angle: <span id="tiltAngleLabel" class="text-[#e36414]">0&deg;</span>
+                </label>
+                <span class="text-[11px] text-slate-500">(Keep &lt; 65&deg; so liquid stays in!)</span>
+              </div>
+              <input id="jugTiltSlider" type="range" min="0" max="80" value="0" oninput="updateJugTilt(this.value)" class="w-full accent-[#e36414] cursor-pointer" />
+            </div>
+
+            <!-- Live Fire Triangle Status Monitor -->
+            <div class="p-3 rounded-xl bg-slate-900 text-white space-y-1.5">
+              <div class="text-[11px] uppercase tracking-wider font-bold text-slate-400">Live Fire Triangle Status</div>
+              <div class="grid grid-cols-3 gap-1.5 text-center text-xs font-bold">
+                <div id="ftHeat" class="py-1.5 rounded bg-slate-800 text-slate-400">HEAT: OFF</div>
+                <div id="ftFuel" class="py-1.5 rounded bg-emerald-900/80 text-emerald-300">FUEL: WAX</div>
+                <div id="ftOxygen" class="py-1.5 rounded bg-emerald-900/80 text-emerald-300">O<sub>2</sub>: PRESENT</div>
+              </div>
+              <div id="chemStatusText" class="text-xs text-cyan-200 pt-1">
+                Ready: Follow Steps 1 to 4 to run the experiment.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Part 3 Lab Assessment (10 Marks) -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+          <div>
+            <h3 class="text-lg font-extrabold text-slate-900">Part 3 Assessment: Chemical Reaction &amp; Fire Safety</h3>
+            <p class="text-xs text-slate-500">4 Lab Questions = 10 Marks Total</p>
+          </div>
+          <span id="part3ScoreBadge" class="px-3 py-1 rounded-full bg-rose-100 text-rose-800 font-extrabold text-sm">
+            Score: 0 / 10
+          </span>
+        </div>
+
+        <!-- Lab Q1 (2 Marks) -->
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+          <label class="block text-sm font-bold text-slate-900">
+            1. Observation: What happened to the candle flame when you tilted the jug (without spilling liquid)? (2 Marks)
+          </label>
+          <select id="p3q1" onchange="evaluateAll()" class="w-full rounded-lg border border-slate-300 p-2 text-sm bg-white">
+            <option value="">-- Select observation --</option>
+            <option value="wrong1">The flame turned bright purple and grew three times taller.</option>
+            <option value="correct">The candle flame went out (extinguished) even though no liquid touched it.</option>
+            <option value="wrong2">Nothing happened because gases always float straight up to the ceiling.</option>
+          </select>
+          <div class="teacher-key hidden text-xs bg-amber-50 border border-amber-300 p-2 rounded text-amber-950">
+            <strong>Judge Key:</strong> The flame is extinguished without any liquid touching the wick (2 marks).
+          </div>
+        </div>
+
+        <!-- Lab Q2 (3 Marks — Interactive Equation Builder) -->
+        <div class="p-4 rounded-xl bg-amber-50/60 border border-amber-200 space-y-2">
+          <label class="block text-sm font-bold text-slate-900">
+            2. Complete the Chemical Word Equation: (3 Marks — 1.5 Marks per blank)
+          </label>
+          <div class="flex flex-wrap items-center gap-2 bg-white p-3 rounded-xl border border-slate-300 text-sm font-semibold">
+            <span>Sodium bicarbonate + Vinegar &rarr;</span>
+            <select id="p3q2a" onchange="evaluateAll()" class="rounded-lg border-2 border-[#0f4c5c] px-2.5 py-1 bg-cyan-50 font-bold text-[#0f4c5c]">
+              <option value="">[Select Product 1]</option>
+              <option value="correct">Sodium acetate</option>
+              <option value="wrong1">Sodium chloride</option>
+              <option value="wrong2">Calcium carbonate</option>
+            </select>
+            <span>+ Water +</span>
+            <select id="p3q2b" onchange="evaluateAll()" class="rounded-lg border-2 border-[#e36414] px-2.5 py-1 bg-orange-50 font-bold text-[#e36414]">
+              <option value="">[Select Gas]</option>
+              <option value="wrong1">Hydrogen</option>
+              <option value="wrong2">Oxygen</option>
+              <option value="correct">Carbon dioxide</option>
+            </select>
+            <span>gas</span>
+          </div>
+          <div class="teacher-key hidden text-xs bg-amber-50 border border-amber-300 p-2 rounded text-amber-950">
+            <strong>Judge Key:</strong> Sodium acetate (1.5 marks) + Carbon dioxide gas (1.5 marks).
+          </div>
+        </div>
+
+        <!-- Lab Q3 (3 Marks) -->
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+          <label class="block text-sm font-bold text-slate-900">
+            3. Density &amp; Fire Triangle Principle: Why did the gas pour downward and put out the flame? (3 Marks)
+          </label>
+          <select id="p3q3" onchange="evaluateAll()" class="w-full rounded-lg border border-slate-300 p-2 text-sm bg-white">
+            <option value="">-- Select scientific explanation --</option>
+            <option value="correct">Carbon dioxide is denser (heavier) than air so it flows downward, displacing oxygen around the wick and breaking the fire triangle.</option>
+            <option value="wrong1">Carbon dioxide freezes the wax to &minus;100&deg;C so the wick snaps in half.</option>
+            <option value="wrong2">Vinegar vapours dissolve the cotton wick instantly.</option>
+          </select>
+          <div class="teacher-key hidden text-xs bg-amber-50 border border-amber-300 p-2 rounded text-amber-950">
+            <strong>Judge Key:</strong> CO<sub>2</sub> is heavier/denser than air (1.5 marks) + displaces oxygen to break the fire triangle (1.5 marks).
+          </div>
+        </div>
+
+        <!-- Lab Q4 (2 Marks) -->
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+          <label class="block text-sm font-bold text-slate-900">
+            4. Real-World Engineering Link: How is this exact scientific principle applied in fire safety? (2 Marks)
+          </label>
+          <select id="p3q4" onchange="evaluateAll()" class="w-full rounded-lg border border-slate-300 p-2 text-sm bg-white">
+            <option value="">-- Select engineering application --</option>
+            <option value="wrong1">Smoke detectors use vinegar to ring an alarm bell.</option>
+            <option value="correct">Carbon dioxide (CO2) fire extinguishers blanket flames in dense CO2 gas to cut off their oxygen supply.</option>
+            <option value="wrong2">Firefighters spray baking soda powder onto electrical wires to increase oxygen.</option>
+          </select>
+          <div class="teacher-key hidden text-xs bg-amber-50 border border-amber-300 p-2 rounded text-amber-950">
+            <strong>Judge Key:</strong> CO<sub>2</sub> fire extinguishers smother fires by displacing oxygen (2 marks).
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- TAB 4: LEADERBOARD, CERTIFICATE & GITHUB HOSTING EXPORT   -->
+    <!-- ========================================================= -->
+    <section id="tab4" class="tab-content hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Team Scorecard & Certificate Preview -->
+        <div class="lg:col-span-6 bg-white rounded-2xl shadow-sm border-2 border-[#0f4c5c] p-6 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+            <div>
+              <span class="text-xs font-extrabold uppercase tracking-wider text-[#e36414]">Official Contest Summary</span>
+              <h2 class="text-xl font-extrabold text-[#0f4c5c]">Team Performance Scorecard</h2>
+            </div>
+            <button onclick="window.print()" class="no-print px-3.5 py-2 rounded-xl bg-[#0f4c5c] hover:bg-[#0b3b47] text-white text-xs font-bold shadow transition">
+              🖨️ Print Certificate
+            </button>
+          </div>
+
+          <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-2 text-sm">
+            <div class="flex justify-between">
+              <span class="text-slate-500 font-semibold">School:</span>
+              <span class="font-bold text-slate-900">The Trust School</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-500 font-semibold">Team / House:</span>
+              <span id="certTeamName" class="font-bold text-slate-900">Unregistered Team</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-500 font-semibold">Class &amp; Section:</span>
+              <span id="certSection" class="font-bold text-slate-900">Section 7-A</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-500 font-semibold">Team Members:</span>
+              <span id="certMembers" class="font-bold text-slate-900">—</span>
+            </div>
+          </div>
+
+          <div class="space-y-2.5">
+            <div class="flex justify-between items-center p-3 rounded-xl bg-cyan-50 border border-cyan-200">
+              <span class="font-bold text-sm text-slate-800">Part 1: Nanotech Diabetes Reading</span>
+              <span id="certP1" class="font-extrabold text-[#0f4c5c]">0 / 10</span>
+            </div>
+            <div class="flex justify-between items-center p-3 rounded-xl bg-orange-50 border border-orange-200">
+              <span class="font-bold text-sm text-slate-800">Part 2: Rapid-Fire STEM &amp; Motion</span>
+              <span id="certP2" class="font-extrabold text-[#e36414]">0 / 10</span>
+            </div>
+            <div class="flex justify-between items-center p-3 rounded-xl bg-rose-50 border border-rose-200">
+              <span class="font-bold text-sm text-slate-800">Part 3: Chemical Reaction Lab</span>
+              <span id="certP3" class="font-extrabold text-rose-800">0 / 10</span>
+            </div>
+            <div class="flex justify-between items-center p-4 rounded-xl bg-[#0f4c5c] text-white">
+              <span class="font-extrabold text-base uppercase">Grand Total Score</span>
+              <span id="certTotal" class="font-extrabold text-2xl text-amber-300">0 / 30</span>
+            </div>
+          </div>
+
+          <div class="pt-2 flex flex-wrap gap-2 no-print">
+            <button onclick="recordToLeaderboard()" class="flex-1 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow transition">
+              🏆 Submit to Inter-Section Leaderboard
+            </button>
+          </div>
+        </div>
+
+        <!-- Inter-Section Live Leaderboard (localStorage) -->
+        <div class="lg:col-span-6 bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+            <div>
+              <span class="text-xs font-extrabold uppercase tracking-wider text-emerald-700">Classroom Smartboard Standings</span>
+              <h2 class="text-xl font-extrabold text-slate-900">Class 7 Inter-Section Leaderboard</h2>
+            </div>
+            <button onclick="clearLeaderboard()" class="no-print px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-rose-100 text-slate-600 hover:text-rose-700 text-xs font-bold transition">
+              Clear Board
+            </button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm">
+              <thead>
+                <tr class="bg-slate-800 text-white text-xs uppercase">
+                  <th class="py-2.5 px-3 rounded-tl-lg">Rank</th>
+                  <th class="py-2.5 px-3">Section</th>
+                  <th class="py-2.5 px-3">Team / House</th>
+                  <th class="py-2.5 px-3 text-center">P1</th>
+                  <th class="py-2.5 px-3 text-center">P2</th>
+                  <th class="py-2.5 px-3 text-center">P3</th>
+                  <th class="py-2.5 px-3 text-right rounded-tr-lg">Total</th>
+                </tr>
+              </thead>
+              <tbody id="leaderboardBody" class="divide-y divide-slate-200">
+                <!-- Populated dynamically via JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- GitHub Pages Quick-Deploy Helper Box -->
+          <div class="mt-4 p-4 rounded-xl bg-slate-900 text-slate-200 space-y-2 no-print">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-extrabold uppercase tracking-wider text-amber-400">
+                🚀 GitHub Pages Ready (Single-File App)
+              </span>
+              <button onclick="downloadGitHubFile()" class="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition">
+                Download index.html
+              </button>
+            </div>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              This entire simulation (HTML5 Canvas labs, auto-grader, timer, and leaderboard) lives inside one self-contained <code class="text-cyan-300">index.html</code> file. Upload it to any GitHub repository and enable <strong>Settings &rarr; Pages</strong> to share a live link with students!
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-white border-t border-slate-200 py-3 px-4 text-center text-xs text-slate-500 no-print">
+    Adapted from CSIRO Double Helix Science Newsletter for <strong>The Trust School</strong> Class 7 Academic Activities
+  </footer>
+
+  <!-- TEACHER / JUDGE PIN MODAL (Custom Modal — No browser prompt/alert used) -->
+  <div id="teacherModal" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-extrabold text-[#0f4c5c]">Teacher / Judge Access</h3>
+        <button onclick="closeTeacherModal()" class="text-slate-400 hover:text-slate-700 font-bold text-lg">&times;</button>
+      </div>
+      <p class="text-xs text-slate-600">
+        Enter the Judge PIN to unlock official marking rubrics and answer keys across all three contest rounds.
+        <span class="block mt-1 text-slate-400">(Default Teacher PIN: <strong>1234</strong>)</span>
+      </p>
+      <input id="judgePinInput" type="password" maxlength="6" placeholder="Enter PIN (1234)" class="w-full rounded-xl border-2 border-slate-300 px-3.5 py-2 text-center font-mono text-lg tracking-widest focus:outline-none focus:border-[#0f4c5c]" />
+      <p id="pinErrorMsg" class="hidden text-xs font-bold text-rose-600 text-center">Incorrect PIN. Try 1234.</p>
+      <div class="flex gap-2">
+        <button onclick="closeTeacherModal()" class="flex-1 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm transition">
+          Cancel
+        </button>
+        <button onclick="verifyTeacherPin()" class="flex-1 py-2 rounded-xl bg-[#0f4c5c] hover:bg-[#0b3b47] text-white font-bold text-sm transition">
+          Unlock Keys
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CUSTOM TOAST NOTIFICATION BOX (Replaces alert()) -->
+  <div id="toastBox" class="hidden fixed bottom-5 right-5 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl border border-slate-700 text-sm font-semibold flex items-center gap-2">
+    <span id="toastIcon">✅</span>
+    <span id="toastMessage">Action completed!</span>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- JAVASCRIPT: SIMULATIONS, GRADING ENGINE & LEADERBOARD     -->
+  <!-- ========================================================= -->
+  <script>
+    // -----------------------------------------------------------
+    // 1. GLOBAL CONTEST STATE & UTILITY FUNCTIONS
+    // -----------------------------------------------------------
+    let timerSeconds = 45 * 60;
+    let timerInterval = null;
+    let isTeacherMode = false;
+    let scores = { p1: 0, p2: 0, p3: 0, total: 0 };
+
+    function showToast(msg, icon = '✅') {
+      const box = document.getElementById('toastBox');
+      document.getElementById('toastMessage').textContent = msg;
+      document.getElementById('toastIcon').textContent = icon;
+      box.classList.remove('hidden');
+      clearTimeout(box._timeout);
+      box._timeout = setTimeout(() => {
+        box.classList.add('hidden');
+      }, 3200);
+    }
+
+    // Tab Switching
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById(tabId).classList.remove('hidden');
+
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-[#0f4c5c]', 'text-white', 'border-[#0f4c5c]');
+        btn.classList.add('bg-white', 'text-slate-800', 'border-slate-200');
+      });
+
+      const activeBtn = document.getElementById('btn-' + tabId);
+      activeBtn.classList.remove('bg-white', 'text-slate-800', 'border-slate-200');
+      activeBtn.classList.add('bg-[#0f4c5c]', 'text-white', 'border-[#0f4c5c]');
+
+      // Resize canvases cleanly when switching tabs
+      resizeAllCanvases();
+      updateCertificatePreview();
+    }
+
+    // Countdown Timer Controls
+    function updateTimerDisplay() {
+      const mins = Math.floor(timerSeconds / 60);
+      const secs = timerSeconds % 60;
+      document.getElementById('timerDisplay').textContent =
+        String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
+    }
+
+    function toggleTimer() {
+      const btn = document.getElementById('timerToggleBtn');
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        btn.textContent = 'Resume';
+      } else {
+        btn.textContent = 'Pause';
+        timerInterval = setInterval(() => {
+          if (timerSeconds > 0) {
+            timerSeconds--;
+            updateTimerDisplay();
+          } else {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            showToast('Time is up! Please submit your section score.', '⏰');
+          }
+        }, 1000);
+      }
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      timerSeconds = 45 * 60;
+      updateTimerDisplay();
+      document.getElementById('timerToggleBtn').textContent = 'Start';
+    }
+
+    // Teacher / Judge PIN Modal Controls
+    function openTeacherModal() {
+      if (isTeacherMode) {
+        disableTeacherMode();
+        return;
+      }
+      document.getElementById('judgePinInput').value = '';
+      document.getElementById('pinErrorMsg').classList.add('hidden');
+      document.getElementById('teacherModal').classList.remove('hidden');
+      document.getElementById('judgePinInput').focus();
+    }
+
+    function closeTeacherModal() {
+      document.getElementById('teacherModal').classList.add('hidden');
+    }
+
+    function verifyTeacherPin() {
+      const pin = document.getElementById('judgePinInput').value.trim();
+      if (pin === '1234') {
+        isTeacherMode = true;
+        closeTeacherModal();
+        document.getElementById('teacherBanner').classList.remove('hidden');
+        document.getElementById('teacherModeBtn').innerHTML = '<span>🔓 Judge Mode: ON</span>';
+        document.querySelectorAll('.teacher-key').forEach(el => el.classList.remove('hidden'));
+        showToast('Judge Mode unlocked! Answer keys visible.', '🔓');
+      } else {
+        document.getElementById('pinErrorMsg').classList.remove('hidden');
+      }
+    }
+
+    function disableTeacherMode() {
+      isTeacherMode = false;
+      document.getElementById('teacherBanner').classList.add('hidden');
+      document.getElementById('teacherModeBtn').innerHTML = '<span>🔒 Judge Mode: OFF</span>';
+      document.querySelectorAll('.teacher-key').forEach(el => el.classList.add('hidden'));
+      showToast('Judge Mode locked.', '🔒');
+    }
+
+    function autoFillDemoAnswers() {
+      document.getElementById('p1q1').value = 'correct';
+      document.getElementById('p1q2').value = 'correct';
+      document.getElementById('p1q3').value = 'correct';
+      document.getElementById('p1q4').value = 'correct';
+      document.getElementById('p1q5').value = 'correct';
+
+      document.getElementById('p2q1').value = 'correct';
+      document.getElementById('p2q2').value = 'correct';
+      document.getElementById('p2q3').value = 'correct';
+      document.getElementById('p2q4').value = 'correct';
+      document.getElementById('p2q5a').value = '20';
+      document.getElementById('p2q5b').value = '0';
+
+      document.getElementById('p3q1').value = 'correct';
+      document.getElementById('p3q2a').value = 'correct';
+      document.getElementById('p3q2b').value = 'correct';
+      document.getElementById('p3q3').value = 'correct';
+      document.getElementById('p3q4').value = 'correct';
+
+      evaluateAll();
+      showToast('All model answers populated (30/30).', '✨');
+    }
+
+    // -----------------------------------------------------------
+    // 2. AUTO-GRADING ENGINE (30 MARKS TOTAL)
+    // -----------------------------------------------------------
+    function evaluateAll() {
+      // Part 1: 5 questions x 2 marks = 10 marks
+      let p1 = 0;
+      ['p1q1', 'p1q2', 'p1q3', 'p1q4', 'p1q5'].forEach(id => {
+        if (document.getElementById(id).value === 'correct') p1 += 2;
+      });
+
+      // Part 2: 4 MCQs x 2 marks + Q5 (1 + 1 marks) = 10 marks
+      let p2 = 0;
+      ['p2q1', 'p2q2', 'p2q3', 'p2q4'].forEach(id => {
+        if (document.getElementById(id).value === 'correct') p2 += 2;
+      });
+      const q5a = parseFloat(document.getElementById('p2q5a').value);
+      const q5b = parseFloat(document.getElementById('p2q5b').value);
+      if (q5a === 20) p2 += 1;
+      if (q5b === 0 && document.getElementById('p2q5b').value.trim() !== '') p2 += 1;
+
+      // Part 3: Q1 (2) + Q2a (1.5) + Q2b (1.5) + Q3 (3) + Q4 (2) = 10 marks
+      let p3 = 0;
+      if (document.getElementById('p3q1').value === 'correct') p3 += 2;
+      if (document.getElementById('p3q2a').value === 'correct') p3 += 1.5;
+      if (document.getElementById('p3q2b').value === 'correct') p3 += 1.5;
+      if (document.getElementById('p3q3').value === 'correct') p3 += 3;
+      if (document.getElementById('p3q4').value === 'correct') p3 += 2;
+
+      scores = { p1, p2, p3, total: p1 + p2 + p3 };
+
+      document.getElementById('part1ScoreBadge').textContent = `Score: ${p1} / 10`;
+      document.getElementById('part2ScoreBadge').textContent = `Score: ${p2} / 10`;
+      document.getElementById('part3ScoreBadge').textContent = `Score: ${p3} / 10`;
+      document.getElementById('totalScoreDisplay').textContent = scores.total;
+
+      updateCertificatePreview();
+    }
+
+    function updateCertificatePreview() {
+      const team = document.getElementById('teamNameInput').value.trim() || 'Unregistered Team';
+      const section = document.getElementById('sectionSelect').value;
+      const members = document.getElementById('membersInput').value.trim() || '—';
+
+      document.getElementById('certTeamName').textContent = team;
+      document.getElementById('certSection').textContent = section;
+      document.getElementById('certMembers').textContent = members;
+      document.getElementById('certP1').textContent = `${scores.p1} / 10`;
+      document.getElementById('certP2').textContent = `${scores.p2} / 10`;
+      document.getElementById('certP3').textContent = `${scores.p3} / 10`;
+      document.getElementById('certTotal').textContent = `${scores.total} / 30`;
+    }
+
+    // -----------------------------------------------------------
+    // 3. INTERACTIVE SIMULATION A: NANOTECH DIABETES CHIP
+    // -----------------------------------------------------------
+    let chipType = 'gold'; // 'standard' or 'gold'
+    let bloodSample = 'type1'; // 'type1', 'type2', 'healthy'
+    let nanoParticles = [];
+
+    function initNanoParticles() {
+      nanoParticles = [];
+      for (let i = 0; i < 28; i++) {
+        nanoParticles.push({
+          x: Math.random(),
+          y: Math.random() * 0.55,
+          vx: (Math.random() - 0.5) * 0.003,
+          vy: (Math.random() - 0.5) * 0.003,
+          isAntibody: i < 10
+        });
+      }
+    }
+
+    function setChipType(type) {
+      chipType = type;
+      const stdBtn = document.getElementById('chipStandardBtn');
+      const goldBtn = document.getElementById('chipGoldBtn');
+      if (type === 'gold') {
+        goldBtn.className = 'px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold border-2 border-amber-500 bg-amber-500 text-slate-950 shadow transition';
+        stdBtn.className = 'px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold border-2 border-slate-300 bg-slate-100 text-slate-700 transition';
+      } else {
+        stdBtn.className = 'px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold border-2 border-cyan-500 bg-cyan-600 text-white shadow transition';
+        goldBtn.className = 'px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold border-2 border-slate-300 bg-slate-100 text-slate-700 transition';
+      }
+      updateNanoReadout();
+    }
+
+    function setBloodSample(sample) {
+      bloodSample = sample;
+      ['type1', 'type2', 'healthy'].forEach(s => {
+        const btn = document.getElementById('sample' + s.charAt(0).toUpperCase() + s.slice(1) + 'Btn');
+        if (s === sample) {
+          btn.className = 'w-full text-left px-3.5 py-2.5 rounded-xl border-2 border-[#0f4c5c] bg-cyan-50 font-semibold text-sm text-slate-900 transition';
+        } else {
+          btn.className = 'w-full text-left px-3.5 py-2.5 rounded-xl border-2 border-slate-200 bg-white hover:border-slate-400 font-semibold text-sm text-slate-900 transition';
+        }
+      });
+      updateNanoReadout();
+    }
+
+    function updateNanoReadout() {
+      const badge = document.getElementById('nanoReadoutBadge');
+      let sampleLabel = 'Type 1 Diabetes Blood';
+      let signalHTML = '';
+
+      if (bloodSample === 'type1') {
+        sampleLabel = 'Patient A (Type 1 Autoimmune Antibodies)';
+        if (chipType === 'gold') {
+          signalHTML = '<span class="text-amber-400 font-bold">98% (100&times; Amplified — Type 1 Confirmed!)</span>';
+        } else {
+          signalHTML = '<span class="text-rose-400 font-bold">11% (Too Faint — Missed by Standard Chip!)</span>';
+        }
+      } else if (bloodSample === 'type2') {
+        sampleLabel = 'Patient B (Type 2 Insulin Resistance)';
+        signalHTML = '<span class="text-emerald-400 font-bold">2% (Zero Autoimmune Antibodies &rarr; Type 2)</span>';
+      } else {
+        sampleLabel = 'Patient C (Healthy Control)';
+        signalHTML = '<span class="text-emerald-400 font-bold">0% (Normal Blood Sample)</span>';
+      }
+
+      badge.innerHTML = `<span><strong>Sample:</strong> ${sampleLabel}</span><span><strong>Detector Signal:</strong> ${signalHTML}</span>`;
+    }
+
+    function drawNanotechCanvas(time) {
+      const canvas = document.getElementById('nanotechCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Background dark lab grid
+      ctx.fillStyle = '#020617';
+      ctx.fillRect(0, 0, w, h);
+
+      // Glass substrate base
+      const glassY = h * 0.72;
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(w * 0.08, glassY, w * 0.84, 24);
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(w * 0.08, glassY, w * 0.84, 24);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = 'bold 12px Inter, sans-serif';
+      ctx.fillText('GLASS SENSOR CHIP SUBSTRATE', w * 0.1, glassY + 16);
+
+      // Draw Gold Nano-Islands if Gold Chip selected
+      const numIslands = 9;
+      for (let i = 0; i < numIslands; i++) {
+        const ix = w * (0.15 + i * 0.087);
+        if (chipType === 'gold') {
+          // Glowing gold nano-island
+          const pulse = 0.6 + 0.4 * Math.sin(time * 0.005 + i);
+          if (bloodSample === 'type1') {
+            const grad = ctx.createRadialGradient(ix, glassY - 12, 4, ix, glassY - 12, 48 * pulse);
+            grad.addColorStop(0, 'rgba(251, 191, 36, 0.9)');
+            grad.addColorStop(1, 'rgba(251, 191, 36, 0)');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(ix, glassY - 12, 48 * pulse, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.fillStyle = '#f59e0b';
+          ctx.beginPath();
+          ctx.ellipse(ix, glassY - 3, 18, 6, 0, Math.PI, 0);
+          ctx.fill();
+        }
+
+        // Capture antigen receptor (Y-shaped)
+        ctx.strokeStyle = chipType === 'gold' ? '#fde68a' : '#64748b';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(ix, glassY - 6);
+        ctx.lineTo(ix, glassY - 22);
+        ctx.lineTo(ix - 7, glassY - 30);
+        ctx.moveTo(ix, glassY - 22);
+        ctx.lineTo(ix + 7, glassY - 30);
+        ctx.stroke();
+
+        // Bound Type 1 Autoimmune Antibody
+        if (bloodSample === 'type1') {
+          ctx.strokeStyle = '#fb7185';
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.moveTo(ix, glassY - 32);
+          ctx.lineTo(ix, glassY - 46);
+          ctx.lineTo(ix - 8, glassY - 54);
+          ctx.moveTo(ix, glassY - 46);
+          ctx.lineTo(ix + 8, glassY - 54);
+          ctx.stroke();
+        }
+      }
+
+      // Floating blood droplet particles
+      nanoParticles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x < 0.1 || p.x > 0.9) p.vx *= -1;
+        if (p.y < 0.08 || p.y > 0.52) p.vy *= -1;
+
+        const px = p.x * w;
+        const py = p.y * h;
+
+        if (p.isAntibody && bloodSample === 'type1') {
+          // Floating Type 1 Antibody
+          ctx.strokeStyle = '#fb7185';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(px, py);
+          ctx.lineTo(px, py - 10);
+          ctx.lineTo(px - 6, py - 16);
+          ctx.moveTo(px, py - 10);
+          ctx.lineTo(px + 6, py - 16);
+          ctx.stroke();
+        } else {
+          // Glucose / regular plasma molecule
+          ctx.fillStyle = bloodSample === 'healthy' ? '#34d399' : '#38bdf8';
+          ctx.beginPath();
+          ctx.arc(px, py, 3.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+
+      // Top HUD label
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = 'bold 13px Inter, sans-serif';
+      ctx.fillText(
+        chipType === 'gold'
+          ? 'MODE: STANFORD GOLD NANO-ISLAND AMPLIFIER (100x SENSITIVITY)'
+          : 'MODE: STANDARD GLASS SLIDE (1x LOW SENSITIVITY)',
+        16,
+        26
+      );
+    }
+
+    // -----------------------------------------------------------
+    // 4. INTERACTIVE SIMULATION B: UNICYCLE RELATIVE MOTION
+    // -----------------------------------------------------------
+    let unicycleSpeed = 10; // km/h
+    let slowMo = false;
+    let wheelAngle = 0;
+
+    function updateUnicycleSpeed(val) {
+      unicycleSpeed = parseInt(val, 10);
+      document.getElementById('speedLabel').textContent = `${unicycleSpeed} km/h`;
+      document.getElementById('topWheelSpeed').textContent = `${unicycleSpeed * 2} km/h`;
+      document.getElementById('axleWheelSpeed').textContent = `${unicycleSpeed} km/h`;
+      document.getElementById('bottomWheelSpeed').textContent = `0 km/h`;
+    }
+
+    function toggleSlowMo() {
+      slowMo = !slowMo;
+      document.getElementById('slowMoBtn').textContent = slowMo ? 'Slow-Mo: ON' : 'Slow-Mo: OFF';
+    }
+
+    function drawArrow(ctx, x1, y1, x2, y2, color, label) {
+      if (Math.abs(x2 - x1) < 2) return;
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+
+      // Arrowhead
+      const angle = Math.atan2(y2 - y1, x2 - x1);
+      ctx.beginPath();
+      ctx.moveTo(x2, y2);
+      ctx.lineTo(x2 - 10 * Math.cos(angle - 0.4), y2 - 10 * Math.sin(angle - 0.4));
+      ctx.lineTo(x2 - 10 * Math.cos(angle + 0.4), y2 - 10 * Math.sin(angle + 0.4));
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.font = 'bold 12px Inter, sans-serif';
+      ctx.fillText(label, x2 + 8, y2 + 4);
+    }
+
+    function drawUnicycleCanvas() {
+      const canvas = document.getElementById('unicycleCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, 0, w, h);
+
+      const groundY = h * 0.78;
+      const radius = Math.min(w, h) * 0.22;
+      const cx = w * 0.42;
+      const cy = groundY - radius;
+
+      // Advance rotation angle
+      const speedFactor = slowMo ? 0.002 : 0.007;
+      wheelAngle += unicycleSpeed * speedFactor;
+
+      // Moving road markers to show forward velocity
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(0, groundY);
+      ctx.lineTo(w, groundY);
+      ctx.stroke();
+
+      const dashSpacing = 60;
+      const offset = (wheelAngle * radius) % dashSpacing;
+      ctx.fillStyle = '#94a3b8';
+      for (let x = w - offset; x > -dashSpacing; x -= dashSpacing) {
+        ctx.fillRect(x, groundY + 8, 28, 4);
+      }
+
+      // Unicycle Fork & Seat
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx, cy - radius * 1.45);
+      ctx.stroke();
+
+      // Seat
+      ctx.fillStyle = '#e36414';
+      ctx.beginPath();
+      ctx.roundRect(cx - 26, cy - radius * 1.55, 52, 14, 7);
+      ctx.fill();
+
+      // Wheel Tire
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 8;
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Spokes
+      ctx.strokeStyle = '#64748b';
+      ctx.lineWidth = 2;
+      for (let s = 0; s < 8; s++) {
+        const a = wheelAngle + (s * Math.PI) / 4;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(cx + Math.cos(a) * (radius - 4), cy + Math.sin(a) * (radius - 4));
+        ctx.stroke();
+      }
+
+      // Reference marker dot on tire rim
+      const rimX = cx + Math.cos(wheelAngle) * radius;
+      const rimY = cy + Math.sin(wheelAngle) * radius;
+      ctx.fillStyle = '#facc15';
+      ctx.beginPath();
+      ctx.arc(rimX, rimY, 6, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Velocity Vectors (Top, Axle, Bottom)
+      const vecScale = 5.5;
+      // Top point
+      ctx.fillStyle = '#10b981';
+      ctx.beginPath();
+      ctx.arc(cx, cy - radius, 6, 0, Math.PI * 2);
+      ctx.fill();
+      drawArrow(ctx, cx, cy - radius, cx + unicycleSpeed * 2 * vecScale, cy - radius, '#10b981', `Top: ${unicycleSpeed * 2} km/h`);
+
+      // Center axle
+      ctx.fillStyle = '#f59e0b';
+      ctx.beginPath();
+      ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+      ctx.fill();
+      drawArrow(ctx, cx, cy, cx + unicycleSpeed * vecScale, cy, '#f59e0b', `Axle: ${unicycleSpeed} km/h`);
+
+      // Bottom contact point
+      ctx.fillStyle = '#f43f5e';
+      ctx.beginPath();
+      ctx.arc(cx, groundY, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#fda4af';
+      ctx.font = 'bold 12px Inter, sans-serif';
+      ctx.fillText('Bottom Contact: 0 km/h (Stationary)', cx + 14, groundY - 6);
+    }
+
+    // -----------------------------------------------------------
+    // 5. INTERACTIVE SIMULATION C: POUR OUT THE INVISIBLE GAS
+    // -----------------------------------------------------------
+    let chemState = {
+      candleLit: false,
+      hasSoda: false,
+      hasVinegar: false,
+      co2Level: 0, // 0 to 100
+      tiltAngle: 0,
+      co2Particles: [],
+      smokeParticles: []
+    };
+
+    function chemLightCandle() {
+      chemState.candleLit = true;
+      document.getElementById('step1Check').textContent = '✅';
+      document.getElementById('ftHeat').className = 'py-1.5 rounded bg-amber-600 text-white';
+      document.getElementById('ftHeat').textContent = 'HEAT: LIT';
+      document.getElementById('ftOxygen').className = 'py-1.5 rounded bg-emerald-900/80 text-emerald-300';
+      document.getElementById('ftOxygen').innerHTML = 'O<sub>2</sub>: PRESENT';
+      document.getElementById('chemStatusText').textContent = 'Candle is lit! Now add baking soda to the jug.';
+    }
+
+    function chemAddSoda() {
+      chemState.hasSoda = true;
+      document.getElementById('step2Check').textContent = '✅';
+      document.getElementById('chemStatusText').textContent = 'Sodium bicarbonate added. Now pour in vinegar!';
+    }
+
+    function chemAddVinegar() {
+      if (!chemState.hasSoda) {
+        showToast('Add baking soda first (Step 2)!', '🥄');
+        return;
+      }
+      chemState.hasVinegar = true;
+      chemState.co2Level = 100;
+      document.getElementById('step3Check').textContent = '✅';
+      document.getElementById('chemStatusText').textContent = 'Fizzing! CO2 gas formed inside the jug. Tilt the jug over the candle!';
+    }
+
+    function updateJugTilt(angle) {
+      chemState.tiltAngle = parseInt(angle, 10);
+      document.getElementById('tiltAngleLabel').textContent = `${chemState.tiltAngle}°`;
+    }
+
+    function resetChemLab() {
+      chemState = {
+        candleLit: false,
+        hasSoda: false,
+        hasVinegar: false,
+        co2Level: 0,
+        tiltAngle: 0,
+        co2Particles: [],
+        smokeParticles: []
+      };
+      document.getElementById('jugTiltSlider').value = 0;
+      document.getElementById('tiltAngleLabel').textContent = '0°';
+      document.getElementById('step1Check').textContent = '🔥';
+      document.getElementById('step2Check').textContent = '🥄';
+      document.getElementById('step3Check').textContent = '🧪';
+      document.getElementById('ftHeat').className = 'py-1.5 rounded bg-slate-800 text-slate-400';
+      document.getElementById('ftHeat').textContent = 'HEAT: OFF';
+      document.getElementById('ftOxygen').className = 'py-1.5 rounded bg-emerald-900/80 text-emerald-300';
+      document.getElementById('ftOxygen').innerHTML = 'O<sub>2</sub>: PRESENT';
+      document.getElementById('chemStatusText').textContent = 'Lab bench reset. Follow Steps 1 to 4.';
+    }
+
+    function drawChemCanvas(time) {
+      const canvas = document.getElementById('chemCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = '#090d16';
+      ctx.fillRect(0, 0, w, h);
+
+      // Lab bench table
+      const tableY = h * 0.84;
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(0, tableY, w, h - tableY);
+      ctx.strokeStyle = '#334155';
+      ctx.beginPath();
+      ctx.moveTo(0, tableY);
+      ctx.lineTo(w, tableY);
+      ctx.stroke();
+
+      // Candle on the right side
+      const candleX = w * 0.72;
+      const candleW = 34;
+      const candleH = 85;
+      const candleTopY = tableY - candleH;
+
+      // Candle body
+      ctx.fillStyle = '#f8fafc';
+      ctx.beginPath();
+      ctx.roundRect(candleX - candleW / 2, candleTopY, candleW, candleH, 4);
+      ctx.fill();
+
+      // Wick
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(candleX, candleTopY);
+      ctx.lineTo(candleX, candleTopY - 12);
+      ctx.stroke();
+
+      // Flame if lit
+      if (chemState.candleLit) {
+        const flicker = Math.sin(time * 0.02) * 3;
+        const grad = ctx.createRadialGradient(candleX, candleTopY - 26, 2, candleX, candleTopY - 26, 36);
+        grad.addColorStop(0, 'rgba(254, 240, 138, 0.95)');
+        grad.addColorStop(0.5, 'rgba(249, 115, 22, 0.6)');
+        grad.addColorStop(1, 'rgba(249, 115, 22, 0)');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(candleX, candleTopY - 26, 36, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#facc15';
+        ctx.beginPath();
+        ctx.ellipse(candleX + flicker * 0.4, candleTopY - 24, 8, 17, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Tilting Jug on the left side
+      const jugPivotX = w * 0.44;
+      const jugPivotY = h * 0.42;
+      const rad = (chemState.tiltAngle * Math.PI) / 180;
+
+      ctx.save();
+      ctx.translate(jugPivotX, jugPivotY);
+      ctx.rotate(rad);
+
+      const jugW = 86;
+      const jugH = 120;
+      // Jug outline
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 3;
+      ctx.fillStyle = 'rgba(148, 163, 184, 0.12)';
+      ctx.beginPath();
+      ctx.roundRect(-jugW / 2, -jugH / 2, jugW, jugH, 8);
+      ctx.fill();
+      ctx.stroke();
+
+      // Baking soda layer
+      if (chemState.hasSoda && !chemState.hasVinegar) {
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(-jugW / 2 + 3, jugH / 2 - 20, jugW - 6, 17);
+      }
+
+      // Fizzing liquid layer
+      if (chemState.hasVinegar) {
+        ctx.fillStyle = 'rgba(56, 189, 248, 0.45)';
+        ctx.fillRect(-jugW / 2 + 3, jugH / 2 - 42, jugW - 6, 39);
+
+        // Fizz bubbles
+        for (let b = 0; b < 12; b++) {
+          const bx = -jugW / 2 + 10 + ((b * 19 + time * 0.03) % (jugW - 20));
+          const by = jugH / 2 - 8 - ((time * 0.05 + b * 11) % 34);
+          ctx.fillStyle = '#e0f2fe';
+          ctx.beginPath();
+          ctx.arc(bx, by, 2.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      // Dense CO2 cloud inside jug
+      if (chemState.co2Level > 0) {
+        ctx.fillStyle = `rgba(167, 243, 208, ${0.28 * (chemState.co2Level / 100)})`;
+        ctx.fillRect(-jugW / 2 + 4, -jugH / 2 + 6, jugW - 8, jugH - 50);
+        ctx.fillStyle = '#6ee7b7';
+        ctx.font = 'bold 11px Inter, sans-serif';
+        ctx.fillText('CO2 GAS', -24, -10);
+      }
+
+      ctx.restore();
+
+      // Spawn pouring CO2 particles when tilted >= 35 degrees and CO2 is available
+      if (chemState.tiltAngle >= 35 && chemState.co2Level > 0) {
+        const spoutX = jugPivotX + Math.cos(rad - 0.7) * 70;
+        const spoutY = jugPivotY + Math.sin(rad - 0.7) * 70;
+        for (let p = 0; p < 3; p++) {
+          chemState.co2Particles.push({
+            x: spoutX + (Math.random() - 0.5) * 14,
+            y: spoutY + (Math.random() - 0.5) * 10,
+            vx: 1.4 + Math.random() * 1.4,
+            vy: 1.6 + Math.random() * 1.5,
+            alpha: 0.85
+          });
+        }
+        chemState.co2Level = Math.max(0, chemState.co2Level - 0.35);
+
+        if (chemState.tiltAngle > 65) {
+          document.getElementById('chemStatusText').textContent = 'Careful! Tilting past 65° risks spilling liquid vinegar!';
+        }
+      }
+
+      // Update & draw falling dense CO2 particles
+      for (let i = chemState.co2Particles.length - 1; i >= 0; i--) {
+        const pt = chemState.co2Particles[i];
+        pt.x += pt.vx;
+        pt.y += pt.vy;
+        if (pt.y > tableY - 6) {
+          pt.y = tableY - 6;
+          pt.vy = 0;
+          pt.vx *= 0.96;
+        }
+        pt.alpha -= 0.008;
+
+        // Check if CO2 reaches candle flame
+        if (
+          chemState.candleLit &&
+          Math.abs(pt.x - candleX) < 28 &&
+          Math.abs(pt.y - (candleTopY - 18)) < 28
+        ) {
+          chemState.candleLit = false;
+          document.getElementById('ftHeat').className = 'py-1.5 rounded bg-slate-800 text-slate-400';
+          document.getElementById('ftHeat').textContent = 'HEAT: OUT';
+          document.getElementById('ftOxygen').className = 'py-1.5 rounded bg-rose-900 text-rose-200';
+          document.getElementById('ftOxygen').innerHTML = 'O<sub>2</sub>: DISPLACED';
+          document.getElementById('chemStatusText').textContent =
+            'Success! Heavy CO2 displaced the oxygen and extinguished the flame!';
+          showToast('Flame extinguished by dense CO2 gas!', '🧯');
+
+          // Spawn rising smoke wisps
+          for (let s = 0; s < 14; s++) {
+            chemState.smokeParticles.push({
+              x: candleX + (Math.random() - 0.5) * 8,
+              y: candleTopY - 15,
+              vy: -1 - Math.random(),
+              alpha: 0.8
+            });
+          }
+        }
+
+        if (pt.alpha <= 0) {
+          chemState.co2Particles.splice(i, 1);
+        } else {
+          ctx.fillStyle = `rgba(110, 231, 183, ${pt.alpha})`;
+          ctx.beginPath();
+          ctx.arc(pt.x, pt.y, 6, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      // Draw smoke particles after flame goes out
+      for (let i = chemState.smokeParticles.length - 1; i >= 0; i--) {
+        const sm = chemState.smokeParticles[i];
+        sm.y += sm.vy;
+        sm.x += Math.sin(time * 0.01 + i) * 0.6;
+        sm.alpha -= 0.012;
+        if (sm.alpha <= 0) {
+          chemState.smokeParticles.splice(i, 1);
+        } else {
+          ctx.fillStyle = `rgba(203, 213, 225, ${sm.alpha})`;
+          ctx.beginPath();
+          ctx.arc(sm.x, sm.y, 4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    }
+
+    // -----------------------------------------------------------
+    // 6. INTER-SECTION LEADERBOARD (localStorage) & GITHUB EXPORT
+    // -----------------------------------------------------------
+    const STORAGE_KEY = 'trust_school_class7_science_leaderboard_v1';
+
+    function loadLeaderboard() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      let list = [];
+      if (raw) {
+        try {
+          list = JSON.parse(raw);
+        } catch (e) {
+          list = [];
+        }
+      }
+      renderLeaderboard(list);
+    }
+
+    function recordToLeaderboard() {
+      evaluateAll();
+      const team = document.getElementById('teamNameInput').value.trim() || 'Team Scholars';
+      const section = document.getElementById('sectionSelect').value;
+
+      const raw = localStorage.getItem(STORAGE_KEY);
+      let list = raw ? JSON.parse(raw) : [];
+
+      // Update if section + team already exists, else push new entry
+      const existingIdx = list.findIndex(item => item.section === section && item.team.toLowerCase() === team.toLowerCase());
+      const entry = {
+        section,
+        team,
+        p1: scores.p1,
+        p2: scores.p2,
+        p3: scores.p3,
+        total: scores.total
+      };
+
+      if (existingIdx >= 0) {
+        list[existingIdx] = entry;
+      } else {
+        list.push(entry);
+      }
+
+      // Sort descending by total score
+      list.sort((a, b) => b.total - a.total);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+      renderLeaderboard(list);
+      showToast(`Saved ${section} (${team}): ${scores.total}/30!`, '🏆');
+    }
+
+    function renderLeaderboard(list) {
+      const tbody = document.getElementById('leaderboardBody');
+      if (!list.length) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="py-6 text-center text-slate-400 text-xs">
+              No section scores recorded yet. Complete the challenges and click <strong>"Save Score to Board"</strong>!
+            </td>
+          </tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list
+        .map((row, idx) => {
+          const medal = idx === 0 ? '🥇 1st' : idx === 1 ? '🥈 2nd' : idx === 2 ? '🥉 3rd' : `#${idx + 1}`;
+          return `
+            <tr class="${idx === 0 ? 'bg-amber-50/70 font-semibold' : ''}">
+              <td class="py-2.5 px-3 font-extrabold text-slate-800">${medal}</td>
+              <td class="py-2.5 px-3 font-bold text-[#0f4c5c]">${row.section}</td>
+              <td class="py-2.5 px-3 text-slate-800">${row.team}</td>
+              <td class="py-2.5 px-3 text-center text-slate-600">${row.p1}</td>
+              <td class="py-2.5 px-3 text-center text-slate-600">${row.p2}</td>
+              <td class="py-2.5 px-3 text-center text-slate-600">${row.p3}</td>
+              <td class="py-2.5 px-3 text-right font-extrabold text-emerald-700">${row.total} / 30</td>
+            </tr>`;
+        })
+        .join('');
+    }
+
+    function clearLeaderboard() {
+      localStorage.removeItem(STORAGE_KEY);
+      renderLeaderboard([]);
+      showToast('Leaderboard cleared.', '🗑️');
+    }
+
+    // Download clean index.html for GitHub Pages deployment
+    function downloadGitHubFile() {
+      const htmlContent = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+      const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'index.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('Downloaded index.html ready for GitHub Pages!', '🚀');
+    }
+
+    // -----------------------------------------------------------
+    // 7. RESPONSIVE CANVAS RESIZING & ANIMATION LOOP
+    // -----------------------------------------------------------
+    function resizeAllCanvases() {
+      ['nanotechCanvas', 'unicycleCanvas', 'chemCanvas'].forEach(id => {
+        const c = document.getElementById(id);
+        if (c && c.parentElement) {
+          const rect = c.getBoundingClientRect();
+          if (rect.width > 0 && rect.height > 0) {
+            c.width = rect.width;
+            c.height = rect.height;
+          }
+        }
+      });
+    }
+
+    function animateLoop(timestamp) {
+      drawNanotechCanvas(timestamp);
+      drawUnicycleCanvas();
+      drawChemCanvas(timestamp);
+      requestAnimationFrame(animateLoop);
+    }
+
+    window.addEventListener('resize', resizeAllCanvases);
+
+    window.onload = function () {
+      initNanoParticles();
+      resizeAllCanvases();
+      loadLeaderboard();
+      evaluateAll();
+      requestAnimationFrame(animateLoop);
+    };
+  </script>
+</body>
+</html>
